@@ -1,6 +1,7 @@
 import { Form, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { Layout } from "../../layouts/Layout";
 
 export const LoginScreen = ({ setToken }: any) => {
   let navigate = useNavigate();
@@ -9,8 +10,6 @@ export const LoginScreen = ({ setToken }: any) => {
     username: "",
     password: "",
   });
-
-  console.log(formData);
 
   const handleChange = (event: any) => {
     setFormData((prevFormData) => {
@@ -32,7 +31,8 @@ export const LoginScreen = ({ setToken }: any) => {
 
       if (error) throw error;
       console.log(data);
-      setToken(data);
+      setToken(data[0]);
+      localStorage.setItem("@user", JSON.stringify(data[0]));
       navigate("/");
 
       //   alert('Check your email for verification link')
@@ -42,7 +42,7 @@ export const LoginScreen = ({ setToken }: any) => {
   };
 
   return (
-    <div>
+    <Layout>
       <header className="login-header">
         <div className="login-header-container">
           <div className="login-header-logo">
@@ -430,6 +430,6 @@ export const LoginScreen = ({ setToken }: any) => {
           </div>
         </div>
       </footer>
-    </div>
+    </Layout>
   );
 };

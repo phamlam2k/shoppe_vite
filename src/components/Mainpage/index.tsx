@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Form, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { Layout } from "../../layouts/Layout";
 
 export const MainPageScreen = () => {
   const [products, setProducts] = useState<any>([]);
@@ -14,8 +15,9 @@ export const MainPageScreen = () => {
     const { data } = await supabase.from("products").select("*");
     setProducts(data);
   };
+
   return (
-    <div>
+    <Layout>
       <div className="app_banner">
         <div className="grid wide">
           <div className="row sm-gutter app_banner-content">
@@ -721,32 +723,33 @@ export const MainPageScreen = () => {
       </div>
       <div className="product-suggest">
         <div className="product-suggest-title">GỢI Ý HÔM NAY</div>
-        {products && (
-          <div id="product-suggest-content">
-            {products.map((product: any) => (
-              <a
-                className="product-suggest-item"
-                href="/product.html?id=${res.data[i].id}"
-              >
-                <div className="product-suggest-img">
-                  <img src={product.image} alt="" width="100%" />
-                </div>
-                <div style={{ backgroundColor: "#fff", padding: "8px" }}>
-                  <p className="product-suggest-text">{product.name}</p>
-                  <div className="product-suggest-info">
-                    <p className="product-suggest-price">{product.price}</p>
-                    <p className="product-suggest-sold">
-                      Đã bán {product.quantity}
-                    </p>
+        <div className="product-suggest-content">
+          <div className="product-suggest-list">
+            {products &&
+              products.map((product: any) => (
+                <a
+                  className="product-suggest-item"
+                  href={`/product/${product.id}`}
+                >
+                  <div className="product-suggest-img">
+                    <img src={product.image} alt="" width="100%" />
                   </div>
-                </div>
-                <div className="product-suggest-more-popup">
-                  Sản phẩm tương tự
-                </div>
-              </a>
-            ))}
+                  <div style={{ backgroundColor: "#fff", padding: "8px" }}>
+                    <p className="product-suggest-text">{product.name}</p>
+                    <div className="product-suggest-info">
+                      <p className="product-suggest-price">{product.price}</p>
+                      <p className="product-suggest-sold">
+                        Đã bán {product.quantity}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="product-suggest-more-popup">
+                    Sản phẩm tương tự
+                  </div>
+                </a>
+              ))}
           </div>
-        )}
+        </div>
 
         <div className="container container-button-seemore">
           <button className="btn-seemore" type="submit">
@@ -754,6 +757,6 @@ export const MainPageScreen = () => {
           </button>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };

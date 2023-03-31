@@ -1,6 +1,54 @@
-export const CartScreen = () => {
+import { useMemo } from "react";
+import { Product } from "../Product";
+import { supabase } from "../../supabaseClient";
+import { Layout } from "../../layouts/Layout";
+import { useNavigate } from "react-router-dom";
+
+export const CartScreen = ({ token }: { token: any }) => {
+  const navigate = useNavigate();
+  const cart = useMemo(() => {
+    return JSON.parse(localStorage.getItem("@cart") ?? "[]");
+  }, []);
+
+  const onBuyProduct = async () => {
+    try {
+      const request = cart.map(
+        async (item: {
+          created_at: string | null;
+          description: string;
+          id: number;
+          image: string;
+          name: string;
+          price: number;
+          quantity: number;
+          count: number;
+        }) => {
+          return supabase.from("order").insert({
+            productId: item.id,
+            userId: token.id,
+            quantity: item.count,
+            totalPrice: item.price,
+          });
+        }
+      );
+
+      Promise.all(request)
+        .then((responses) => {
+          navigate("/history");
+          alert("Đặt hàng thành công");
+        })
+        .catch((error) => {
+          alert("Đặt hàng không thành công");
+        });
+    } catch (error) {
+      console.log("Dat hang khong thanh cong");
+    } finally {
+      localStorage.removeItem("@cart");
+    }
+  };
+
   return (
-    <div>
+    <Layout>
       <section className="cart">
         <div className="cart-container">
           <div className="cart-title-tabel">
@@ -8,132 +56,66 @@ export const CartScreen = () => {
               <i className="fa-regular fa-square fa-lg"></i>
             </div>
             <div className="cart-title-product">Sản phẩm</div>
-            <div className="cart-title-unit-price">Đơn giá</div>
             <div className="cart-title-quantity">Số lượng</div>
             <div className="cart-title-price">Số tiền</div>
             <div className="cart-title-action">Thao tác</div>
           </div>
           <div className="cart-body">
-            <div className="cart-body-item">
-              <div className="cart-body-product">
-                <div className="cart-title-checkbox">
-                  <i className="fa-regular fa-square fa-lg"></i>
-                </div>
-                <div className="cart-body-sticker">
-                  <i className="fa-solid fa-shop fa-sm"></i>
-                </div>
-                <p className="shop-name">TOPSKIN</p>
-              </div>
-              <div className="cart-product">
-                <div className="cart-title-checkbox">
-                  <i className="fa-regular fa-square fa-lg"></i>
-                </div>
-                <div className="cart-product-item">
-                  <div style={{ display: "flex" }}>
-                    <img
-                      src="https://cf.shopee.vn/file/5fbf7c585793e90aab043c4fe1e2c13b_tn"
-                      alt=""
-                      width="80px"
-                      height="80px"
-                    />
-                    <div className="cart-product-item-text">
-                      MIẾNG DÁN 3M HỞ ĐÈN LED - CÓ MẪU CHO TẤT CẢ CÁC DÒNG
-                      MACBOOK
+            {cart.map(
+              (item: {
+                created_at: string | null;
+                description: string;
+                id: number;
+                image: string;
+                name: string;
+                price: number;
+                quantity: number;
+                count: number;
+              }) => (
+                <div className="cart-body-item">
+                  <div className="cart-body-product">
+                    <div className="cart-title-checkbox">
+                      <i className="fa-regular fa-square fa-lg"></i>
+                    </div>
+                    <div className="cart-body-sticker">
+                      <i className="fa-solid fa-shop fa-sm"></i>
+                    </div>
+                    <p className="shop-name">TOPSKIN</p>
+                  </div>
+                  <div className="cart-product">
+                    <div className="cart-title-checkbox">
+                      <i className="fa-regular fa-square fa-lg"></i>
+                    </div>
+                    <div className="cart-product-item">
+                      <div style={{ display: "flex" }}>
+                        <img
+                          src={item.image}
+                          alt=""
+                          width="80px"
+                          height="80px"
+                        />
+                        <div className="cart-product-item-text">
+                          {item.name}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="cart-product-unitprice">{item.count}</div>
+                    <div className="cart-product-price">đ{item.price}</div>
+                    <div className="cart-product-action">
+                      <p style={{ textAlign: "center" }}>Xóa</p>
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <p style={{ textAlign: "center", color: "#ee4d2d" }}>
+                          Tìm sản phẩm tương tự
+                        </p>
+                        <button title="more" className="button-more"></button>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="cart-product-text">
-                  <span>Phân loại hàng</span>
-                  <button title="more" className="button-more"></button>
-                  <p style={{ marginTop: "7px" }}>
-                    Black matrix,Macpro m1 13inh
-                  </p>
-                </div>
-                <div className="cart-product-unitprice">₫225.000</div>
-                <div className="cart-product-quantity">
-                  <button className="button-plus">-</button>
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="button-quantity"
-                    value="1"
-                    placeholder="xxxx"
-                  />
-                  <button className="button-plus">+</button>
-                </div>
-                <div className="cart-product-price">₫225.000</div>
-                <div className="cart-product-action">
-                  <p style={{ textAlign: "center" }}>Xóa</p>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <p style={{ textAlign: "center", color: "#ee4d2d" }}>
-                      Tìm sản phẩm tương tự
-                    </p>
-                    <button title="more" className="button-more"></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="cart-body-item">
-              <div className="cart-body-product">
-                <div className="cart-title-checkbox">
-                  <i className="fa-regular fa-square fa-lg"></i>
-                </div>
-                <div className="cart-body-sticker">
-                  <i className="fa-solid fa-shop fa-sm"></i>
-                </div>
-                <p className="shop-name">TOPSKIN</p>
-              </div>
-              <div className="cart-product">
-                <div className="cart-title-checkbox">
-                  <i className="fa-regular fa-square fa-lg"></i>
-                </div>
-                <div className="cart-product-item">
-                  <div style={{ display: "flex" }}>
-                    <img
-                      src="https://cf.shopee.vn/file/5fbf7c585793e90aab043c4fe1e2c13b_tn"
-                      alt=""
-                      width="80px"
-                      height="80px"
-                    />
-                    <div className="cart-product-item-text">
-                      MIẾNG DÁN 3M HỞ ĐÈN LED - CÓ MẪU CHO TẤT CẢ CÁC DÒNG
-                      MACBOOK
-                    </div>
-                  </div>
-                </div>
-                <div className="cart-product-text">
-                  <span>Phân loại hàng</span>
-                  <button title="more" className="button-more"></button>
-                  <p style={{ marginTop: "7px" }}>
-                    Black matrix,Macpro m1 13inh
-                  </p>
-                </div>
-                <div className="cart-product-unitprice">₫225.000</div>
-                <div className="cart-product-quantity">
-                  <button className="button-plus">-</button>
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="button-quantity"
-                    value="1"
-                    placeholder="xxxx"
-                  />
-                  <button className="button-plus">+</button>
-                </div>
-                <div className="cart-product-price">₫225.000</div>
-                <div className="cart-product-action">
-                  <p style={{ textAlign: "center" }}>Xóa</p>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <p style={{ textAlign: "center", color: "#ee4d2d" }}>
-                      Tìm sản phẩm tương tự
-                    </p>
-                    <button title="more" className="button-more"></button>
-                  </div>
-                </div>
-              </div>
-            </div>
+              )
+            )}
           </div>
           <div className="checkout-box">
             <div className="checkout-voucher-box">
@@ -169,9 +151,11 @@ export const CartScreen = () => {
                 <p style={{ color: "#ee4d2d" }}>Lưu vào mục Đã thích</p>
               </div>
               <div className="final-checkout-item">
-                <p>Tổng thanh toán (0 Sản phẩm):</p>
+                <p>Tổng thanh toán ({} Sản phẩm):</p>
                 <p>₫0</p>
-                <button className="button-buy">Mua Hàng</button>
+                <button className="button-buy" onClick={onBuyProduct}>
+                  Mua Hàng
+                </button>
               </div>
             </div>
           </div>
@@ -398,6 +382,6 @@ export const CartScreen = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
