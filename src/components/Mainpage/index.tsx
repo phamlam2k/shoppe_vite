@@ -1,6 +1,19 @@
 import { Link } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient";
 
 export const MainPageScreen = () => {
+  const [products, setProducts] = useState<any>([]);
+
+  useEffect(() => {
+    getProduct();
+  }, []);
+
+  const getProduct = async () => {
+    const { data } = await supabase.from("products").select("*");
+    setProducts(data);
+  };
   return (
     <div>
       <div className="app_banner">
@@ -708,9 +721,37 @@ export const MainPageScreen = () => {
       </div>
       <div className="product-suggest">
         <div className="product-suggest-title">GỢI Ý HÔM NAY</div>
-        <div id="product-suggest-content"></div>
+        {products && (
+          <div id="product-suggest-content">
+            {products.map((product: any) => (
+              <a
+                className="product-suggest-item"
+                href="/product.html?id=${res.data[i].id}"
+              >
+                <div className="product-suggest-img">
+                  <img src={product.image} alt="" width="100%" />
+                </div>
+                <div style={{ backgroundColor: "#fff", padding: "8px" }}>
+                  <p className="product-suggest-text">{product.name}</p>
+                  <div className="product-suggest-info">
+                    <p className="product-suggest-price">{product.price}</p>
+                    <p className="product-suggest-sold">
+                      Đã bán {product.quantity}
+                    </p>
+                  </div>
+                </div>
+                <div className="product-suggest-more-popup">
+                  Sản phẩm tương tự
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+
         <div className="container container-button-seemore">
-          <button className="btn-seemore">Xem thêm</button>
+          <button className="btn-seemore" type="submit">
+            Xem thêm
+          </button>
         </div>
       </div>
     </div>

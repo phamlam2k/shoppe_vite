@@ -12,16 +12,17 @@ export const LoginScreen = ({ setToken }: any) => {
 
   console.log(formData);
 
-  const handleChange = ({ event }: any) => {
+  const handleChange = (event: any) => {
     setFormData((prevFormData) => {
       return {
         ...prevFormData,
-        [event.target.name]: event.target.formData.value,
+        [event.target.name]: event.target.value,
       };
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
     try {
       const { data, error } = await supabase
         .from("users")
