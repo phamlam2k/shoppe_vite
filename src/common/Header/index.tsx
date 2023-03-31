@@ -1,9 +1,31 @@
-import style from "./style.module.css";
-import { Link, NavLink } from "react-router-dom";
-import { HeaderSeller, HEADER_SELLER, HEADER_USER } from "../../utils/common";
-import { CartIcon, HeaderIcon } from "../CustomIcon";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
+  const [token, setToken] = useState({
+    createdAt: "",
+    id: 0,
+    password: "",
+    username: "",
+  });
+
+  useEffect(() => {
+    if (localStorage.getItem("@user")) {
+      let data = JSON.parse(localStorage.getItem("@user") ?? "{}");
+      setToken(data);
+    }
+  }, []);
+
+  const onLogout = () => {
+    localStorage.removeItem("@user");
+    setToken({
+      createdAt: "",
+      id: 0,
+      password: "",
+      username: "",
+    });
+  };
+
   return (
     <div className="app">
       <header className="header">
@@ -12,7 +34,7 @@ export const Header = () => {
             <ul className="header_navbar-list">
               <li className="header_navbar-item">
                 <a
-                  href="#"
+                  href=""
                   className="header_navbar-item header_navbar-item-bold"
                 >
                   Kênh người bán
@@ -62,12 +84,23 @@ export const Header = () => {
                   <i className="fa-solid fa-caret-down"></i>
                 </a>
               </li>
-              <div id="user_info"></div>
+              <div id="user_info">
+                {token && token.id !== 0 ? (
+                  <div>
+                    <div>{token?.username}</div>
+                    <div onClick={onLogout} style={{ cursor: "pointer" }}>
+                      Logout
+                    </div>
+                  </div>
+                ) : (
+                  <Link to={"/login"}>Login</Link>
+                )}
+              </div>
             </ul>
           </nav>
           <div className="header-with-search">
             <div className="header_logo">
-              <a href="/mainpage.html" className="header_logo-link">
+              <Link to="/" className="header_logo-link">
                 <svg
                   viewBox="0 0 192 65"
                   className="header_logo-img shopee-svg-icon header-with-search_shopee-logo icon-shopee-logo"
@@ -79,7 +112,7 @@ export const Header = () => {
                     ></path>
                   </g>
                 </svg>
-              </a>
+              </Link>
             </div>
             <div className="header_search">
               <div className="header_search-input-wrap">
@@ -137,11 +170,13 @@ export const Header = () => {
                 </li>
               </ul>
             </div>
-            <div className="header_cart">
-              <div className="header_cart-wrap">
-                <i className="header_cart-icon fa-solid fa-cart-shopping"></i>
-              </div>
-            </div>
+            <Link
+              to={"/cart"}
+              className="header_cart"
+              style={{ cursor: "pointer" }}
+            >
+              Cart
+            </Link>
           </div>
         </div>
       </header>
